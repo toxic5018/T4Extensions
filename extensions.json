@@ -110,5 +110,47 @@
         "lastUpdated": "07/26/2025",
         "filePathToCopy": "assets/extensions/networkmanager_extension.js",
         "status": [1]
+    },
+    {
+        "id": "9",
+        "name": "SensingV2",
+        "headerTitle": "Sensing V2",
+        "bannerImage": "assets/textures/extensions/banner/sensingv2_extension.png",
+        "iconImage": "assets/textures/extensions/logo/sensingv2_extension_logo.png",
+        "description": "More ability functions with the new sensing made 2.0, more functions to take advantage of.",
+        "creator": "T4Studios",
+        "releaseDate": "07/26/2025",
+        "version": "1.0.0",
+        "lastUpdated": "07/26/2025",
+        "filePathToCopy": "assets/extensions/sensingv2_extension.js",
+        "status": [1]
+    },
+    {
+        "id": "8",
+        "name": "ImageConverter",
+        "headerTitle": "Image Converter",
+        "bannerImage": "assets/textures/extensions/banner/imageconverter_extension.png",
+        "iconImage": "assets/textures/extensions/logo/imageconverter_extension_logo.png",
+        "description": "Converts image format from one image to another format within a simple click and fetches image file type.",
+        "creator": "T4Studios",
+        "releaseDate": "07/26/2025",
+        "version": "1.0.0",
+        "lastUpdated": "07/26/2025",
+        "filePathToCopy": "assets/extensions/imageconverter_extension.js",
+        "status": [1]
+    },
+    {
+        "id": "8",
+        "name": "LooksV2",
+        "headerTitle": "Looks V2",
+        "bannerImage": "assets/textures/extensions/banner/looksv2_extension.png",
+        "iconImage": "assets/textures/extensions/logo/looksv2_extension_logo.png",
+        "description": "Simple blocks, but more things to find with the new 2.0 version of Looks with more features and info.",
+        "creator": "T4Studios",
+        "releaseDate": "07/26/2025",
+        "version": "1.0.0",
+        "lastUpdated": "07/26/2025",
+        "filePathToCopy": "assets/extensions/looksv2_extension.js",
+        "status": [1]
     }
 ]
