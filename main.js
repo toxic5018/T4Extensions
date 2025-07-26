@@ -57,6 +57,37 @@ async function hashString(str) {
     return hashedString;
 }
 
+// --- Number Formatting Function ---
+function formatNumber(num) {
+    if (num === null || num === undefined) {
+        return 'N/A';
+    }
+    if (num < 1000) {
+        return num.toString();
+    }
+
+    // Thousands
+    if (num < 10000) { // 1K to 9.99K (e.g., 1.00K, 5.23K, 9.99K)
+        return (num / 1000).toFixed(2) + 'K';
+    } else if (num < 100000) { // 10K to 99.9K (e.g., 10.0K, 52.3K, 99.9K)
+        return (num / 1000).toFixed(1) + 'K';
+    } else if (num < 1000000) { // 100K to 999K (e.g., 100K, 523K, 999K)
+        return Math.floor(num / 1000) + 'K';
+    }
+    // Millions
+    else if (num < 10000000) { // 1M to 9.99M
+        return (num / 1000000).toFixed(2) + 'M';
+    } else if (num < 100000000) { // 10M to 99.9M
+        return (num / 1000000).toFixed(1) + 'M';
+    } else if (num < 1000000000) { // 100M to 999M
+        return Math.floor(num / 1000000) + 'M';
+    }
+    // Billions
+    else { // 1B and above
+        return (num / 1000000000).toFixed(2) + 'B';
+    }
+}
+
 
 // Function to update a device's action for a specific stat in Firebase (GLOBAL COUNTS)
 async function updateExtensionStatInFirebase(extensionId, statType, hashedDeviceId, add = true) {
@@ -241,10 +272,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         modalVersion.textContent = extensionData.version || 'N/A';
         modalLastUpdated.textContent = extensionData.lastUpdated || 'N/A';
 
-        // Update modal stats
-        modalLikesCountSpan.textContent = extensionData.likes;
-        modalDislikesCountSpan.textContent = extensionData.dislikes;
-        modalDownloadsCountSpan.textContent = extensionData.downloads;
+        // Update modal stats with formatted numbers
+        modalLikesCountSpan.textContent = formatNumber(extensionData.likes);
+        modalDislikesCountSpan.textContent = formatNumber(extensionData.dislikes);
+        modalDownloadsCountSpan.textContent = formatNumber(extensionData.downloads);
 
         // Set initial selected states for modal stat items and action buttons
         if (extensionData.userActions.liked) {
@@ -350,14 +381,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // Update local object and UI immediately for responsiveness
                 extension.userActions.downloaded = true;
-                
+                extension.downloads++; // Increment raw number
+
                 // Update main grid item
                 const gridExtensionItem = document.querySelector(`.extension-item[data-extension-id="${extensionId}"]`);
                 if (gridExtensionItem) {
                     const downloadStatItem = gridExtensionItem.querySelector('.stat-item.download-stat');
                     const downloadCountSpan = downloadStatItem.querySelector('.stat-count');
-                    const currentDownloads = parseInt(downloadCountSpan.textContent);
-                    downloadCountSpan.textContent = currentDownloads + 1;
+                    downloadCountSpan.textContent = formatNumber(extension.downloads); // Format here
                     downloadStatItem.classList.add('counted-once'); // Mark visually
                     animateStatChange(downloadStatItem, '+1');
                 } else {
@@ -365,7 +396,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 // Update modal's own download count
-                modalDownloadsCountSpan.textContent = parseInt(modalDownloadsCountSpan.textContent) + 1;
+                modalDownloadsCountSpan.textContent = formatNumber(extension.downloads); // Format here
             }
 
             closeExtensionDetailModal(); // Close modal after successful copy/download
@@ -389,13 +420,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const wasLiked = extension.userActions.liked;
         const wasDisliked = extension.userActions.disliked;
 
-        let newLikes = parseInt(modalLikesCountSpan.textContent);
-        let newDislikes = parseInt(modalDislikesCountSpan.textContent);
-
         if (wasLiked) {
             await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, false);
             await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, false);
-            newLikes--;
+            extension.likes--;
             extension.userActions.liked = false;
             modalLikeStatItem.classList.remove('selected');
             modalLikeButton.classList.remove('selected');
@@ -404,7 +432,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // If not liked, like it
             await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, true);
             await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, true);
-            newLikes++;
+            extension.likes++;
             extension.userActions.liked = true;
             modalLikeStatItem.classList.add('selected');
             modalLikeButton.classList.add('selected');
@@ -413,7 +441,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (wasDisliked) {
                 await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, false);
                 await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, false);
-                newDislikes--;
+                extension.dislikes--;
                 extension.userActions.disliked = false;
                 modalDislikeStatItem.classList.remove('selected');
                 modalDislikeButton.classList.remove('selected');
@@ -421,16 +449,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        modalLikesCountSpan.textContent = newLikes;
-        modalDislikesCountSpan.textContent = newDislikes;
+        modalLikesCountSpan.textContent = formatNumber(extension.likes);
+        modalDislikesCountSpan.textContent = formatNumber(extension.dislikes);
 
         // Update the main grid display as well
         const gridExtensionItem = document.querySelector(`.extension-item[data-extension-id="${extensionId}"]`);
         if (gridExtensionItem) {
             const gridLikeStatItem = gridExtensionItem.querySelector('.stat-item.like-stat');
             const gridDislikeStatItem = gridExtensionItem.querySelector('.stat-item.dislike-stat');
-            gridLikeStatItem.querySelector('.stat-count').textContent = newLikes;
-            gridDislikeStatItem.querySelector('.stat-count').textContent = newDislikes;
+            gridLikeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.likes);
+            gridDislikeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.dislikes);
 
             if (extension.userActions.liked) {
                 gridLikeStatItem.classList.add('selected');
@@ -459,14 +487,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const wasLiked = extension.userActions.liked;
         const wasDisliked = extension.userActions.disliked;
 
-        let newLikes = parseInt(modalLikesCountSpan.textContent);
-        let newDislikes = parseInt(modalDislikesCountSpan.textContent);
-
         if (wasDisliked) {
             // If already disliked, un-dislike it
             await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, false);
             await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, false);
-            newDislikes--;
+            extension.dislikes--;
             extension.userActions.disliked = false;
             modalDislikeStatItem.classList.remove('selected');
             modalDislikeButton.classList.remove('selected');
@@ -475,7 +500,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // If not disliked, dislike it
             await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, true);
             await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, true);
-            newDislikes++;
+            extension.dislikes++;
             extension.userActions.disliked = true;
             modalDislikeStatItem.classList.add('selected');
             modalDislikeButton.classList.add('selected');
@@ -484,7 +509,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (wasLiked) {
                 await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, false);
                 await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, false);
-                newLikes--;
+                extension.likes--;
                 extension.userActions.liked = false;
                 modalLikeStatItem.classList.remove('selected');
                 modalLikeButton.classList.remove('selected');
@@ -492,16 +517,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        modalDislikesCountSpan.textContent = newDislikes;
-        modalLikesCountSpan.textContent = newLikes;
+        modalDislikesCountSpan.textContent = formatNumber(extension.dislikes);
+        modalLikesCountSpan.textContent = formatNumber(extension.likes);
 
         // Update the main grid display as well
         const gridExtensionItem = document.querySelector(`.extension-item[data-extension-id="${extensionId}"]`);
         if (gridExtensionItem) {
             const gridLikeStatItem = gridExtensionItem.querySelector('.stat-item.like-stat');
             const gridDislikeStatItem = gridExtensionItem.querySelector('.stat-item.dislike-stat');
-            gridLikeStatItem.querySelector('.stat-count').textContent = newLikes;
-            gridDislikeStatItem.querySelector('.stat-count').textContent = newDislikes;
+            gridLikeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.likes);
+            gridDislikeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.dislikes);
 
             if (extension.userActions.liked) {
                 gridLikeStatItem.classList.add('selected');
@@ -548,9 +573,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 return {
                     ...ext,
-                    likes: likesCount,
-                    dislikes: dislikesCount,
-                    downloads: downloadsCount,
+                    likes: likesCount, // Store raw numbers
+                    dislikes: dislikesCount, // Store raw numbers
+                    downloads: downloadsCount, // Store raw numbers
                     userActions: {
                         liked: userExtActions.liked === true,
                         disliked: userExtActions.disliked === true,
@@ -566,9 +591,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ALL_EXTENSIONS_DATA.forEach(extension => {
                     const extensionId = extension.id;
 
-                    const displayLikes = extension.likes;
-                    const displayDislikes = extension.dislikes;
-                    const displayDownloads = extension.downloads;
+                    // Format numbers for display
+                    const displayLikes = formatNumber(extension.likes);
+                    const displayDislikes = formatNumber(extension.dislikes);
+                    const displayDownloads = formatNumber(extension.downloads);
 
                     const isLikedSelected = extension.userActions.liked;
                     const isDislikedSelected = extension.userActions.disliked;
@@ -675,14 +701,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // Handle Like/Dislike Clicks on grid items
                     likeStatItem.addEventListener('click', async (e) => {
                         e.stopPropagation(); // Prevent modal from opening
-                        let newLikes = extension.likes;
-                        let newDislikes = extension.dislikes; // Need to track this for potential updates
 
                         if (extension.userActions.liked) {
                             // If already liked, unlike it
                             await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, false);
                             await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, false);
-                            newLikes--;
+                            extension.likes--;
                             extension.userActions.liked = false;
                             likeStatItem.classList.remove('selected');
                             animateStatChange(likeStatItem, '-1');
@@ -690,7 +714,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             // If not liked, like it
                             await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, true);
                             await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, true);
-                            newLikes++;
+                            extension.likes++;
                             extension.userActions.liked = true;
                             likeStatItem.classList.add('selected');
                             animateStatChange(likeStatItem, '+1');
@@ -699,28 +723,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                             if (extension.userActions.disliked) {
                                 await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, false);
                                 await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, false);
-                                newDislikes--;
+                                extension.dislikes--;
                                 extension.userActions.disliked = false;
                                 dislikeStatItem.classList.remove('selected');
                                 animateStatChange(dislikeStatItem, '-1');
                             }
                         }
-                        extension.likes = newLikes; // Update local value
-                        extension.dislikes = newDislikes; // Update local value
-                        likeStatItem.querySelector('.stat-count').textContent = extension.likes;
-                        dislikeStatItem.querySelector('.stat-count').textContent = extension.dislikes; // Update dislike count too
+                        likeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.likes);
+                        dislikeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.dislikes); // Update dislike count too
                     });
 
                     dislikeStatItem.addEventListener('click', async (e) => {
                         e.stopPropagation(); // Prevent modal from opening
-                        let newLikes = extension.likes; // Need to track this for potential updates
-                        let newDislikes = extension.dislikes;
 
                         if (extension.userActions.disliked) {
                             // If already disliked, un-dislike it
                             await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, false);
                             await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, false);
-                            newDislikes--;
+                            extension.dislikes--;
                             extension.userActions.disliked = false;
                             dislikeStatItem.classList.remove('selected');
                             animateStatChange(dislikeStatItem, '-1');
@@ -728,7 +748,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             // If not disliked, dislike it
                             await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, true);
                             await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, true);
-                            newDislikes++;
+                            extension.dislikes++;
                             extension.userActions.disliked = true;
                             dislikeStatItem.classList.add('selected');
                             animateStatChange(dislikeStatItem, '+1');
@@ -737,16 +757,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                             if (extension.userActions.liked) {
                                 await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, false);
                                 await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, false);
-                                newLikes--;
+                                extension.likes--;
                                 extension.userActions.liked = false;
                                 likeStatItem.classList.remove('selected');
                                 animateStatChange(likeStatItem, '-1');
                             }
                         }
-                        extension.dislikes = newDislikes; // Update local value
-                        extension.likes = newLikes; // Update local value
-                        dislikeStatItem.querySelector('.stat-count').textContent = extension.dislikes;
-                        likeStatItem.querySelector('.stat-count').textContent = extension.likes; // Update like count too
+                        dislikeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.dislikes);
+                        likeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.likes); // Update like count too
                     });
 
                     // Download stat is not directly clickable for incrementing in the grid

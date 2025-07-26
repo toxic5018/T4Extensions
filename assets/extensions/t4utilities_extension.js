@@ -1,5 +1,4 @@
 // T4Utilities Extension
-// Version 1.0
 // Made by Toxic5018
 // Follow my website: https://toxic5108.github.io/toxic5108.me/
 

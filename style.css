@@ -52,13 +52,18 @@
     --color-status-development: #FF4500; /* Orange Red */
 
     /* Notification Overlay Colors */
-    --color-notification-overlay-bg: #1a1a2e; /* Background for the notification content */
-    --color-notification-success-border: #32CD32; /* Green for success */
-    --color-notification-error-border: #dc3545; /* Red for error */
+    --color-notification-overlay-bg: #2b2b40; /* Background for the notification content */
+    --color-notification-success-bg: #32CD32; /* Green for success */
+    --color-notification-error-bg: #dc3545; /* Red for error */
 
-    /* Notification Overlay Shadows */
-    --shadow-notification-success: 0 0 15px var(--color-notification-success-border), 0 0 25px rgba(40, 167, 69, 0.5);
-    --shadow-notification-error: 0 0 15px var(--color-notification-error-border), 0 0 25px rgba(220, 53, 69, 0.5);
+    /* Shadows (now primarily for consistent UI elements) */
+    --shadow-neon-soft: 0 0 8px rgba(0, 255, 255, 0.2); /* Soft blue neon glow */
+    --shadow-neon-medium: 0 0 12px rgba(0, 255, 255, 0.3), 0 0 20px rgba(240, 0, 240, 0.2);
+    --shadow-neon-strong: 0 0 15px rgba(0, 255, 255, 0.4), 0 0 25px rgba(240, 0, 240, 0.3);
+
+    /* Notification Overlay Shadows (adjusted for no border) */
+    --shadow-notification-success: 0 0 15px rgba(40, 167, 69, 0.5);
+    --shadow-notification-error: 0 0 15px rgba(220, 53, 69, 0.5);
 }
 
 html, body {
@@ -175,25 +180,21 @@ body {
     border-image-slice: 1;
 }
 
-/* Description Section - includes default hidden state */
+/* Description Section */
 .description-section {
     text-align: center;
     margin-bottom: 20px;
     font-size: 1.2em;
-    padding: 0 20px;
+    padding: 20px; /* Adjusted padding to be consistent */
     color: var(--color-text-light);
     overflow: hidden;
     max-height: 500px;
     opacity: 1;
     transition: max-height 0.5s ease-out, margin-bottom 0.5s ease-out, padding 0.5s ease-out, opacity 0.5s ease-out;
-    border: 2px solid; /* Added border for consistency with notifications */
-    border-image: var(--color-gradient-neon) 1;
-    border-image-slice: 1;
+    /* Removed border and border-image */
     border-radius: 8px;
-    background-color: #2b2b40; /* Added background for consistency */
-    box-shadow: var(--shadow-neon-soft); /* Added shadow for consistency */
-    padding-top: 20px; /* Adjust padding due to new border */
-    padding-bottom: 20px; /* Adjust padding due to new border */
+    background-color: #2b2b40;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Simpler shadow */
 }
 
 /* Hidden state for description */
@@ -203,7 +204,6 @@ body {
     padding-top: 0;
     padding-bottom: 0;
     opacity: 0;
-    border-width: 0; /* Hide border when hidden */
     box-shadow: none; /* Remove shadow when hidden */
 }
 
@@ -1081,15 +1081,13 @@ img {
 
 .notification-content {
     background-color: var(--color-notification-overlay-bg);
-    border: 2px solid;
-    border-image: var(--color-gradient-neon) 1; /* Default neon border */
-    border-image-slice: 1;
+    /* Removed border and border-image */
     border-radius: 10px;
     padding: 30px;
     max-width: 450px; /* Smaller than main modal */
     width: 90%;
     text-align: center;
-    box-shadow: var(--shadow-neon-medium);
+    /* Removed default box-shadow for type-specific shadows */
     transform: translateY(20px);
     opacity: 0;
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
@@ -1141,7 +1139,8 @@ img {
 
 /* Specific styles for success/error notifications */
 .notification-content.success {
-    border-image: linear-gradient(90deg, var(--color-notification-success-border) 0%, var(--color-neon-blue) 100%) 1;
+    /* Removed border-image, now just a background with a strong shadow */
+    background-color: var(--color-notification-overlay-bg); /* Keep consistency with other backgrounds */
     box-shadow: var(--shadow-notification-success);
 }
 
@@ -1151,7 +1150,8 @@ img {
 }
 
 .notification-content.error {
-    border-image: linear-gradient(90deg, var(--color-notification-error-border) 0%, var(--color-neon-purple) 100%) 1;
+    /* Removed border-image, now just a background with a strong shadow */
+    background-color: var(--color-notification-overlay-bg); /* Keep consistency with other backgrounds */
     box-shadow: var(--shadow-notification-error);
 }
 
