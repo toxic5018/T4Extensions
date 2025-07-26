@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T4Studios Extensions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Noto+Sans:wght@400;700&family=Sen:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <header class="taskbar">
+            <h1>T4Extensions</h1>
+        </header>
+
+        <main class="container">
+            <section id="description-section" class="description-section">
+                <p>Extensions that are compatible with most known engines: Turbowarp, PenguinMod, and others. Not compatible with Scratch nor associated with Scratch.</p>
+            </section>
+            <div id="description-toggle" class="description-toggle">
+                <i id="description-arrow" class="material-icons">keyboard_arrow_down</i>
+            </div>
+
+            <section class="ad-section">
+                <img src="assets/ad/ad_banner1.png" alt="Advertisement Banner" class="ad-banner" onerror="this.onerror=null;this.src='https://placehold.co/180x100/333333/FFFFFF?text=Ad+Banner';">
+                <div class="my-website-info">
+                    <h3>My Website</h3>
+                    <a href="https://toxic5018.github.io/toxic5018.me/" target="_blank" rel="noopener noreferrer" class="my-website-button">Visit Website</a>
+                </div>
+            </section>
+
+            <section class="content">
+                <h2>Browse Extensions</h2>
+                <div id="extension-listings" class="extension-grid">
+                </div>
+
+                <section class="website-banner-section">
+                    <img src="assets/ad/ad_banner1.png" alt="Main Website Banner" class="website-banner-image" onerror="this.onerror=null;this.src='https://placehold.co/600x200/333333/FFFFFF?text=Main+Website+Banner';">
+                    <div class="my-website-info">
+                        <h3>My Website</h3>
+                        <a href="https://toxic5018.github.io/toxic5018.me/" target="_blank" rel="noopener noreferrer" class="my-website-button">Visit Website</a>
+                    </div>
+                </section>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 T4Studios / Toxic5018. All rights reserved.</p>
+            <p>Version: <span id="site-version"></span></p>
+            <p>Not affiliated with Scratch or the Scratch Foundation.</p>
+        </footer>
+    </div>
+
+    <div id="extension-detail-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title">Extension Title</h2>
+                <button id="modal-close-button" class="modal-close material-icons">close</button>
+            </div>
+            <div class="modal-body">
+                <img id="modal-banner-thumbnail" src="" alt="Extension Banner Thumbnail" class="modal-banner-thumbnail" onerror="this.onerror=null;this.src='https://placehold.co/300x150/333333/FFFFFF?text=Banner';">
+                <p id="modal-description" class="modal-description">This is a detailed description of the extension.</p>
+                <div class="info-separator"></div>
+                <div class="modal-meta-info">
+                    <p>Creator: <span id="modal-creator">N/A</span></p>
+                    <p>Release Date: <span id="modal-release-date">N/A</span></p>
+                    <p>Version: <span id="modal-version">N/A</span></p>
+                    <p>Last Updated: <span id="modal-last-updated">N/A</span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-stats">
+                    <div class="stat-item like-stat" data-stat-type="likes">
+                        <i class="material-icons like-icon">thumb_up</i>
+                        <span class="stat-count" id="modal-likes-count">0</span>
+                    </div>
+                    <span class="pipe">|</span>
+                    <div class="stat-item dislike-stat" data-stat-type="dislikes">
+                        <i class="material-icons dislike-icon">thumb_down</i>
+                        <span class="stat-count" id="modal-dislikes-count">0</span>
+                    </div>
+                    <span class="pipe">|</span>
+                    <div class="stat-item download-stat">
+                        <i class="material-icons download-icon">download</i>
+                        <span class="stat-count" id="modal-downloads-count">0</span>
+                    </div>
+                </div>
+                <button id="modal-download-button" class="modal-download-button">Download (Copy Code)</button>
+                <div class="modal-action-buttons">
+                    <button id="modal-like-button" class="modal-action-button like-button material-icons">thumb_up</button>
+                    <button id="modal-dislike-button" class="modal-action-button dislike-button material-icons">thumb_down</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="download-notification-overlay" class="notification-overlay">
+        <div id="notification-content" class="notification-content">
+            <h2 id="modal-notification-title" class="notification-title"></h2>
+            <p id="modal-notification-message" class="notification-message"></p>
+            <button id="modal-notification-continue-button" class="notification-button">Continue</button>
+        </div>
+    </div>
+
+    <script src="main.js" type="module"></script>
+</body>
+</html>
