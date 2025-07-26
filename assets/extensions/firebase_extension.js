@@ -414,10 +414,10 @@
             this.runtime = runtime;
         }
         getInfo() {
-            const blockIcon1 = "https://github.com/toxic5018/T4Extension/blob/main/assets/block1.png?raw=true"; // Database
-            const blockIcon2 = "https://github.com/toxic5018/T4Extension/blob/main/assets/block2.png?raw=true"; // User Accounts
-            const blockIcon3 = "https://github.com/toxic5018/T4Extension/blob/main/assets/block3.png?raw=true"; // Core/Config
-            const blockIcon4 = "https://github.com/toxic5018/T4Extension/blob/main/assets/block4.png?raw=true"; // Email Verification
+            const blockIcon1 = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block1.png?raw=true"; // Database
+            const blockIcon2 = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block2.png?raw=true"; // User Accounts
+            const blockIcon3 = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block3.png?raw=true"; // Core/Config
+            const blockIcon4 = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block4.png?raw=true"; // Email Verification
 
             return {
                 id: "toxic5018FirebaseAuthDB",
@@ -425,7 +425,7 @@
                 color1: "#FFA000",
                 color2: "#FF8F00",
                 tbShow: true,
-                menuIconURI: "https://github.com/toxic5018/T4Extension/blob/2c2aaefc0f6685e7305149fe315a1d94661be687/assets/firebase_extension_logo.png?raw=true",
+                menuIconURI: "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/extensions/logo/firebase_extension_logo.png?raw=true",
                 blockIconURI: blockIcon1, // Default block icon to database related blocks
                 blocks: [
                     {

@@ -258,7 +258,7 @@
         }
 
         getInfo() {
-            const blockIcon6 = "https://github.com/toxic5018/T4Extension/blob/main/assets/block6.png?raw=true";
+            const blockIcon6 = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block6.png?raw=true";
             const lightBlue = "#00b3d8"; // Main light blue color
             const darkerBlue = "#0090af"; // Slightly darker shade for secondary
 
@@ -267,7 +267,7 @@
                 name: "TimerPlus",
                 color1: lightBlue,
                 color2: darkerBlue,
-                menuIconURI: "https://github.com/toxic5018/T4Extension/blob/main/assets/timerplus_extension_logo.png?raw=true",
+                menuIconURI: "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/extensions/logo/timerplus_extension_logo.png?raw=true",
                 blockIconURI: blockIcon6,
                 blocks: [
                     {

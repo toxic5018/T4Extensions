@@ -310,8 +310,8 @@
         }
 
         getInfo() {
-            const blockIconGet = "https://github.com/toxic5018/T4Extension/blob/main/assets/block1.png?raw=true"; // For get variable related blocks
-            const blockIconSet = "https://github.com/toxic5018/T4Extension/blob/main/assets/block3.png?raw=true"; // For set, change, remove, value related blocks
+            const blockIconGet = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block1.png?raw=true"; // For get variable related blocks
+            const blockIconSet = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block3.png?raw=true"; // For set, change, remove, value related blocks
             const mainColor = "#ff4d00"; // Orange
             const darkerColor = "#cc3d00"; // Darker orange for secondary color
 
@@ -320,7 +320,7 @@
                 name: "Temporary Variables",
                 color1: mainColor,
                 color2: darkerColor,
-                menuIconURI: "https://github.com/toxic5018/T4Extension/blob/main/assets/temporaryvariables_extension_logo.png?raw=true",
+                menuIconURI: "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/extensions/logo/temporaryvariables_extension_logo.png?raw=true",
                 blocks: [
                     {
                         opcode: "extensionVersion",

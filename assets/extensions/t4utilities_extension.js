@@ -12,8 +12,8 @@
     // --- Extension Configuration ---
     const mainColor = "#1c59ff"; // Blue
     const gradientColor = "#c205ff"; // Purple
-    const blockIcon = "https://github.com/toxic5018/T4Extension/blob/main/assets/block7.png?raw=true";
-    const menuIcon = "https://github.com/toxic5018/T4Extension/blob/main/assets/t4utilities_extension_logo.png?raw=true";
+    const blockIcon = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block7.png?raw=true";
+    const menuIcon = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/extensions/logo/t4utilities_extension_logo.png?raw=true";
 
 
     class T4UtilitiesExtension {

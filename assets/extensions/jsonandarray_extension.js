@@ -820,7 +820,7 @@
         }
 
         getInfo() {
-            const blockIcon5 = "https://github.com/toxic5018/T4Extension/blob/main/assets/block5.png?raw=true";
+            const blockIcon5 = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block5.png?raw=true";
 
             // Colors
             const jsonColor1 = "#000080"; // Navy blue
@@ -833,7 +833,7 @@
                 name: "JSON & Array",
                 color1: jsonColor1, // Default to JSON color for main extension icon
                 color2: jsonColor2,
-                menuIconURI: "https://github.com/toxic5018/T4Extension/blob/main/assets/jsonandarray_extension_logo.png?raw=true",
+                menuIconURI: "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/extensions/logo/jsonandarray_extension_logo.png?raw=true",
                 blockIconURI: blockIcon5,
                 blocks: [
                     {

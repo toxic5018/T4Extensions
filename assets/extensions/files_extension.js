@@ -11,9 +11,9 @@
 
     // --- Extension Configuration ---
     const mainColor = "#ffbf00"; // Orange (removed gradient as requested)
-    const blockIcon9 = "https://github.com/toxic5018/T4Extension/blob/main/assets/block9.png?raw=true";
-    const blockIcon10 = "https://github.com/toxic5018/T4Extension/blob/main/assets/block10.png?raw=true";
-    const menuIcon = "https://github.com/toxic5018/T4Extension/blob/main/assets/files_extension_logo.png?raw=true";
+    const blockIcon9 = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block9.png?raw=true";
+    const blockIcon10 = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/block10.png?raw=true";
+    const menuIcon = "https://github.com/toxic5018/T4Extensions/blob/main/assets/textures/extensions/logo/files_extension_logo.png?raw=true";
 
     // --- Internal State ---
     let lastFileContent = null; // Stores content of the last opened file
