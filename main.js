@@ -57,6 +57,46 @@ async function hashString(str) {
     return hashedString;
 }
 
+// --- Time Formatting Function (NEW) ---
+function formatTimeAgo(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) {
+        return 'Just Now';
+    }
+
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) {
+        return `${minutes}m ago`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+        return `${hours}h ago`;
+    }
+
+    const days = Math.floor(hours / 24);
+    if (days < 7) {
+        return `${days}d ago`;
+    }
+
+    const weeks = Math.floor(days / 7);
+    if (weeks < 4) { // Roughly 4 weeks in a month
+        return `${weeks}w ago`;
+    }
+    
+    const months = Math.floor(days / 30.44); // Average days in a month
+    if (months < 12) {
+        return `${months}mo ago`; // Changed to 'mo' for months to avoid ambiguity with minutes
+    }
+
+    const years = Math.floor(days / 365.25);
+    return `${years}y ago`;
+}
+
 // --- Number Formatting Function ---
 function formatNumber(num) {
     if (num === null || num === undefined) {
@@ -147,6 +187,8 @@ function animateStatChange(statElement, value) {
     }, { once: true });
 }
 
+// Global variable to hold all extensions data after fetching and combining
+let ALL_EXTENSIONS_DATA = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Get or create the unique hashed device ID for this user/browser session
@@ -237,12 +279,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const extensionDetailModal = document.getElementById('extension-detail-modal');
     const modalCloseButton = document.getElementById('modal-close-button');
     const modalTitle = document.getElementById('modal-title');
-    const modalBannerThumbnail = document.getElementById('modal-banner-thumbnail'); // New
+    const modalBannerThumbnail = document.getElementById('modal-banner-thumbnail');
     const modalDescription = document.getElementById('modal-description');
     const modalCreator = document.getElementById('modal-creator');
     const modalReleaseDate = document.getElementById('modal-release-date');
     const modalVersion = document.getElementById('modal-version');
-    const modalLastUpdated = document.getElementById('modal-last-updated');
+    const modalLastUpdated = document.getElementById('modal-last-updated'); // This will now represent "Last Updated" or "Release Date"
+
+    // NEW: Time Ago Spans
+    const modalReleaseTimeAgo = document.getElementById('modal-release-time-ago'); // Keep for original release date in modal
+    const modalVersionTimeAgo = document.getElementById('modal-version-time-ago');
+    const modalLastUpdatedTimeAgo = document.getElementById('modal-last-updated-time-ago'); // This will now represent "Last Updated" or "Release Date" time ago
+
     const modalDownloadButton = document.getElementById('modal-download-button');
 
     // New Modal Stat Elements
@@ -265,12 +313,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         modalTitle.textContent = extensionData.name || 'Extension Details';
-        modalBannerThumbnail.src = extensionData.bannerImage || 'assets/textures/extensions/banner/default_banner.png'; // Set thumbnail
+        modalBannerThumbnail.src = extensionData.bannerImage || 'assets/textures/extensions/banner/default_banner.png';
         modalDescription.textContent = extensionData.longDescription || extensionData.description || 'No detailed description available.';
         modalCreator.textContent = extensionData.creator || 'N/A';
-        modalReleaseDate.textContent = extensionData.releaseDate || 'N/A';
-        modalVersion.textContent = extensionData.version || 'N/A';
-        modalLastUpdated.textContent = extensionData.lastUpdated || 'N/A';
+
+        // --- Conditional Date Display in Modal ---
+        const isSingleVersion = !Array.isArray(extensionData.version) || extensionData.version.length === 1;
+        const displayDate = isSingleVersion ? extensionData.releaseDate : extensionData.lastUpdated;
+        const displayDateLabel = isSingleVersion ? 'Release Date:' : 'Last Updated:';
+        
+        // Update the label and text content for the combined date field
+        const modalCombinedDateLabel = document.getElementById('modal-combined-date-label'); // You'll need to add this span in HTML
+        if(modalCombinedDateLabel) {
+            modalCombinedDateLabel.textContent = displayDateLabel;
+        }
+        modalLastUpdated.textContent = displayDate || 'N/A'; // Using modalLastUpdated for the combined display
+        modalLastUpdatedTimeAgo.textContent = formatTimeAgo(displayDate); // Using modalLastUpdatedTimeAgo for the combined display
+
+        // Display the original release date specifically if multiple versions, otherwise it's the same as "Last Updated"
+        const modalOriginalReleaseDateRow = document.getElementById('modal-original-release-date-row'); // You'll need to add this row in HTML
+        if (modalOriginalReleaseDateRow) {
+            if (!isSingleVersion) {
+                modalOriginalReleaseDateRow.style.display = 'block'; // Show if it's a multi-version extension
+                modalReleaseDate.textContent = extensionData.releaseDate || 'N/A';
+                modalReleaseTimeAgo.textContent = formatTimeAgo(extensionData.releaseDate);
+            } else {
+                modalOriginalReleaseDateRow.style.display = 'none'; // Hide if single version
+            }
+        }
+
+
+        modalVersion.textContent = Array.isArray(extensionData.version)
+                                   ? extensionData.version[extensionData.version.length - 1]
+                                   : extensionData.version || 'N/A';
+        // Use the stored version's last change timestamp for 'time ago'
+        modalVersionTimeAgo.textContent = formatTimeAgo(extensionData.versionLastChangeTimestamp);
+
 
         // Update modal stats with formatted numbers
         modalLikesCountSpan.textContent = formatNumber(extensionData.likes);
@@ -443,9 +521,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, false);
                 extension.dislikes--;
                 extension.userActions.disliked = false;
-                modalDislikeStatItem.classList.remove('selected');
+                modalDislikeStatItem.classList.remove('selected'); // Update modal dislike UI
                 modalDislikeButton.classList.remove('selected');
-                animateStatChange(modalDislikeStatItem, '-1');
             }
         }
 
@@ -511,9 +588,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, false);
                 extension.likes--;
                 extension.userActions.liked = false;
-                modalLikeStatItem.classList.remove('selected');
+                modalLikeStatItem.classList.remove('selected'); // Update modal like UI
                 modalLikeButton.classList.remove('selected');
-                animateStatChange(modalLikeStatItem, '-1');
             }
         }
 
@@ -541,238 +617,281 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-
-    let ALL_EXTENSIONS_DATA = []; // Store the fetched and processed extensions globally
-
-    // --- Main Extension Loading and Interaction Logic ---
+    // --- Core function to load extensions and populate the grid ---
     async function loadExtensions() {
+        const listingsContainer = document.getElementById('extension-listings');
+        listingsContainer.innerHTML = '<p style="text-align: center; color: var(--color-text-light);">Loading extensions...</p>';
+
         try {
-            // 1. Fetch extensions.json from the server
-            const response = await fetch('extensions.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // 1. Fetch local extensions data (your extensions.json)
+            const localExtensionsResponse = await fetch('extensions.json');
+            if (!localExtensionsResponse.ok) {
+                throw new Error(`HTTP error! status: ${localExtensionsResponse.status} from extensions.json`);
             }
-            const jsonExtensions = await response.json();
+            const localExtensions = await localExtensionsResponse.json();
 
-            // 2. Fetch dynamic global stats (device lists for counts) from Firebase Realtime Database
-            const firebaseStatsSnapshot = await get(child(dbRef, 'T4Studios/T4Extensions/Extension/'));
-            const firebaseGlobalStats = firebaseStatsSnapshot.exists() ? firebaseStatsSnapshot.val() : {};
+            // 2. Fetch Firebase global stats and version info
+            let firebaseExtensionsData = {};
+            try {
+                const snapshot = await get(child(dbRef, 'T4Studios/T4Extensions/Extension'));
+                if (snapshot.exists()) {
+                    firebaseExtensionsData = snapshot.val();
+                }
+            } catch (firebaseError) {
+                console.warn("Firebase: Could not fetch global extension stats. Using defaults.", firebaseError);
+                // Continue without Firebase data if there's an issue
+            }
 
-            // 3. Fetch current user's specific actions from Firebase Realtime Database
-            const userActionsSnapshot = await get(child(dbRef, `T4Studios/UserActions/${hashedDeviceId}`));
-            const currentUserActions = userActionsSnapshot.exists() ? userActionsSnapshot.val() : {};
+            // 3. Fetch user's individual actions
+            let userActionsData = {};
+            try {
+                const userSnapshot = await get(child(dbRef, `T4Studios/UserActions/${hashedDeviceId}`));
+                if (userSnapshot.exists()) {
+                    userActionsData = userSnapshot.val();
+                }
+            } catch (userActionsError) {
+                console.warn("Firebase: Could not fetch user actions. Using defaults.", userActionsError);
+            }
 
-            // 4. Combine data: Use static info from JSON, global counts & user's status from Firebase
-            ALL_EXTENSIONS_DATA = jsonExtensions.map(ext => { // Assign to global variable
-                const globalExtStats = firebaseGlobalStats[ext.id] || {};
-                const userExtActions = currentUserActions[ext.id] || {};
+            ALL_EXTENSIONS_DATA = []; // Reset global array
 
-                const likesCount = globalExtStats.likes && globalExtStats.likes.devices ? Object.keys(globalExtStats.likes.devices).length : 0;
-                const dislikesCount = globalExtStats.dislikes && globalExtStats.dislikes.devices ? Object.keys(globalExtStats.dislikes.devices).length : 0;
-                const downloadsCount = globalExtStats.downloads && globalExtStats.downloads.devices ? Object.keys(globalExtStats.downloads.devices).length : 0;
+            for (const localExt of localExtensions) {
+                const extId = localExt.id;
+                const firebaseExt = firebaseExtensionsData[extId] || {}; // Get Firebase data for this extension
+                const userExtActions = userActionsData[extId] || {}; // Get user's actions for this extension
 
-                return {
-                    ...ext,
-                    likes: likesCount, // Store raw numbers
-                    dislikes: dislikesCount, // Store raw numbers
-                    downloads: downloadsCount, // Store raw numbers
-                    userActions: {
-                        liked: userExtActions.liked === true,
-                        disliked: userExtActions.disliked === true,
-                        downloaded: userExtActions.downloaded === true
-                    }
+                // Initialize counts with Firebase data, or 0 if not present
+                let likes = firebaseExt.likes ? Object.keys(firebaseExt.likes.devices || {}).length : 0;
+                let dislikes = firebaseExt.dislikes ? Object.keys(firebaseExt.dislikes.devices || {}).length : 0;
+                let downloads = firebaseExt.downloads ? Object.keys(firebaseExt.downloads.devices || {}).length : 0;
+
+                // Initialize user actions for the current device
+                const userActions = {
+                    liked: !!(firebaseExt.likes && firebaseExt.likes.devices && firebaseExt.likes.devices[hashedDeviceId]),
+                    disliked: !!(firebaseExt.dislikes && firebaseExt.dislikes.devices && firebaseExt.dislikes.devices[hashedDeviceId]),
+                    downloaded: !!(firebaseExt.downloads && firebaseExt.downloads.devices && firebaseExt.downloads.devices[hashedDeviceId]),
+                    // Also check the specific userActions node if it exists (for consistency, though Firebase counts are primary)
+                    likedUser: !!userExtActions.liked,
+                    dislikedUser: !!userExtActions.disliked,
+                    downloadedUser: !!userExtActions.downloaded
                 };
-            });
 
-            const listingsContainer = document.getElementById('extension-listings');
-            listingsContainer.innerHTML = '';
+                // --- Version Tracking Logic (NEW) ---
+                const currentLatestVersion = Array.isArray(localExt.version) ? localExt.version[localExt.version.length - 1] : String(localExt.version || 'N/A');
+                let versionLastChangeTimestamp = firebaseExt.versionInfo?.lastChangeTimestamp || new Date().toISOString(); // Default to now if not set
+                let firebaseStoredVersion = firebaseExt.versionInfo?.latestVersionString;
 
-            if (ALL_EXTENSIONS_DATA && ALL_EXTENSIONS_DATA.length > 0) {
+                // Compare the latest version from local JSON with what's in Firebase
+                if (currentLatestVersion !== firebaseStoredVersion) {
+                    // Version has changed in extensions.json, update Firebase and reset timestamp
+                    const newTimestamp = new Date().toISOString();
+                    await set(child(dbRef, `T4Studios/T4Extensions/Extension/${extId}/versionInfo/latestVersionString`), currentLatestVersion);
+                    await set(child(dbRef, `T4Studios/T4Extensions/Extension/${extId}/versionInfo/lastChangeTimestamp`), newTimestamp);
+                    versionLastChangeTimestamp = newTimestamp; // Use the new timestamp
+                    console.log(`Firebase: Version for extension ${localExt.name} updated from '${firebaseStoredVersion}' to '${currentLatestVersion}'. Timestamp reset to ${newTimestamp}.`);
+                }
+                // --- END Version Tracking Logic ---
+
+
+                // Combine all data for this extension
+                const combinedExtension = {
+                    ...localExt,
+                    likes: likes,
+                    dislikes: dislikes,
+                    downloads: downloads,
+                    userActions: userActions,
+                    versionLastChangeTimestamp: versionLastChangeTimestamp // Add the timestamp for display
+                };
+                ALL_EXTENSIONS_DATA.push(combinedExtension);
+            }
+
+            if (ALL_EXTENSIONS_DATA.length > 0) {
+                listingsContainer.innerHTML = ''; // Clear loading message
+
                 ALL_EXTENSIONS_DATA.forEach(extension => {
-                    const extensionId = extension.id;
-
-                    // Format numbers for display
-                    const displayLikes = formatNumber(extension.likes);
-                    const displayDislikes = formatNumber(extension.dislikes);
-                    const displayDownloads = formatNumber(extension.downloads);
-
-                    const isLikedSelected = extension.userActions.liked;
-                    const isDislikedSelected = extension.userActions.disliked;
-                    const isDownloadedOnce = extension.userActions.downloaded;
-
-                    // Use extension.bannerImage for the background, with a fallback
-                    const headerVisualStyle = `background-image: url('${extension.bannerImage || 'assets/textures/extensions/banner/default_banner.png'}');`;
-                    // Use extension.iconImage for the icon, with a fallback
-                    const iconImageSrc = extension.iconImage || 'assets/textures/extensions/icon/default_icon.png';
-
-                    let statusBadgesHtml = ''; // Initialize as empty string to build multiple badges
-                    // Ensure extension.status is always treated as an array for iteration
-                    const statuses = Array.isArray(extension.status) ? extension.status : [extension.status]; 
-                    
-                    statuses.forEach(statusNum => {
-                        let statusClass = '';
-                        let statusText = '';
-                        switch (statusNum) {
-                            case 1:
-                                statusClass = 'status-new';
-                                statusText = 'NEW!';
-                                break;
-                            case 2:
-                                statusClass = 'status-updated';
-                                statusText = 'UPDATED!';
-                                break;
-                            case 3:
-                                statusClass = 'status-outdated';
-                                statusText = 'OUTDATED!';
-                                break;
-                            case 4:
-                                statusClass = 'status-maintenance';
-                                statusText = 'MAINTENANCE!';
-                                break;
-                            case 5:
-                                statusClass = 'status-development';
-                                statusText = 'DEVELOPMENT!';
-                                break;
-                            case 0:
-                            default:
-                                // No badge for status 0 or unrecognized status
-                                return;
-                        }
-                        if (statusClass) {
-                            statusBadgesHtml += `<span class="status-badge ${statusClass}">${statusText}</span>`;
-                        }
-                    });
-
                     const extensionItem = document.createElement('div');
                     extensionItem.classList.add('extension-item');
-                    extensionItem.dataset.extensionId = extensionId; // Set data attribute for easy lookup
+                    extensionItem.dataset.extensionId = extension.id;
+
+                    // Dynamically set background image
+                    const headerVisualStyle = extension.bannerImage ? `background-image: url('${extension.bannerImage}');` : '';
+
+                    // Generate status badges dynamically
+                    const statusBadgesHtml = (extension.status || []).map(statusIndex => {
+                        const statusMap = {
+                            0: { class: 'status-none', text: 'None' }, // Changed class and text
+                            1: { class: 'status-new', text: 'New!' },
+                            2: { class: 'status-updated', text: 'Updated!' },
+                            3: { class: 'status-broken', text: 'Broken!' },
+                            4: { class: 'status-maintenance', text: 'Maint.' },
+                            5: { class: 'status-beta', text: 'Beta!' }
+                        };
+                        const statusInfo = statusMap[statusIndex];
+                        return statusInfo && statusInfo.text !== 'None' ? `<span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>` : '';
+                    }).join('');
+
+                    // Determine which date to display based on version count
+                    const isSingleVersion = !Array.isArray(extension.version) || extension.version.length === 1;
+                    const displayDate = isSingleVersion ? extension.releaseDate : extension.lastUpdated;
+                    const displayDateLabel = isSingleVersion ? 'Release Date:' : 'Last Updated:';
+
 
                     extensionItem.innerHTML = `
                         <div class="extension-header-visual" style="${headerVisualStyle}">
                             <div class="extension-left-header-content">
-                                <img src="${iconImageSrc}" alt="${extension.name} Icon" class="extension-icon" onerror="this.onerror=null;this.src='https://placehold.co/50x50/333333/FFFFFF?text=Icon';">
+                                <img src="${extension.iconImage}" alt="${extension.name} Icon" class="extension-icon" onerror="this.onerror=null;this.src='https://placehold.co/50x50/333333/FFFFFF?text=Icon';">
                                 <div class="extension-status-badges">
                                     ${statusBadgesHtml}
                                 </div>
                             </div>
                             <div class="extension-stats">
-                                <div class="stat-item like-stat ${isLikedSelected ? 'selected' : ''}" data-stat-type="likes">
+                                <div class="stat-item like-stat ${extension.userActions.liked ? 'selected' : ''}" data-stat-type="likes">
                                     <i class="material-icons like-icon">thumb_up</i>
-                                    <span class="stat-count">${displayLikes}</span>
+                                    <span class="stat-count">${formatNumber(extension.likes)}</span>
                                 </div>
                                 <span class="pipe">|</span>
-                                <div class="stat-item dislike-stat ${isDislikedSelected ? 'selected' : ''}" data-stat-type="dislikes">
+                                <div class="stat-item dislike-stat ${extension.userActions.disliked ? 'selected' : ''}" data-stat-type="dislikes">
                                     <i class="material-icons dislike-icon">thumb_down</i>
-                                    <span class="stat-count">${displayDislikes}</span>
+                                    <span class="stat-count">${formatNumber(extension.dislikes)}</span>
                                 </div>
                                 <span class="pipe">|</span>
-                                <div class="stat-item download-stat ${isDownloadedOnce ? 'counted-once' : ''}">
+                                <div class="stat-item download-stat ${extension.userActions.downloaded ? 'counted-once' : ''}">
                                     <i class="material-icons download-icon">download</i>
-                                    <span class="stat-count">${displayDownloads}</span>
+                                    <span class="stat-count">${formatNumber(extension.downloads)}</span>
                                 </div>
                             </div>
                         </div>
+
                         <p class="extension-description">${extension.description}</p>
+                        <div class="info-separator"></div>
                         <div class="meta-info-list">
                             <div class="extension-meta-bubbles">
-                                <div class="info-bubble creator-bubble">
-                                    <span class="label">Creator:</span> <span>${extension.creator || 'N/A'}</span>
+                                <div class="info-bubble">
+                                    <span class="label">Creator:</span> <span>${extension.creator}</span>
                                 </div>
-                                <div class="info-bubble version-bubble">
-                                    <span class="label">Version:</span> <span>${extension.version || 'N/A'}</span>
+                                <div class="info-bubble">
+                                    <span class="label">Version:</span> <span>${Array.isArray(extension.version) ? extension.version[extension.version.length - 1] : extension.version}</span>
                                 </div>
                             </div>
-                            <div class="info-separator"></div>
-                            <p>Last Updated: <span>${extension.lastUpdated || 'N/A'}</span></p>
+                            <p>${displayDateLabel} <span>${displayDate}</span> <span class="time-ago">${formatTimeAgo(displayDate)}</span></p>
                         </div>
                     `;
                     listingsContainer.appendChild(extensionItem);
 
-                    // Add click listener to open modal
+                    // Add click listener to open modal for each item
                     extensionItem.addEventListener('click', () => {
                         openExtensionDetailModal(extension);
                     });
+                });
 
-                    // Add click listeners for like/dislike/download actions on the grid items
-                    const likeStatItem = extensionItem.querySelector('.stat-item.like-stat');
-                    const dislikeStatItem = extensionItem.querySelector('.stat-item.dislike-stat');
-                    const downloadStatItem = extensionItem.querySelector('.stat-item.download-stat');
-
-                    // Handle Like/Dislike Clicks on grid items
-                    likeStatItem.addEventListener('click', async (e) => {
+                // Attach event listeners for like/dislike/download on grid items
+                // Use event delegation for efficiency
+                listingsContainer.querySelectorAll('.stat-item.like-stat, .stat-item.dislike-stat').forEach(statItem => {
+                    statItem.addEventListener('click', async (e) => {
                         e.stopPropagation(); // Prevent modal from opening
+                        const extensionId = statItem.closest('.extension-item').dataset.extensionId;
+                        const statType = statItem.dataset.statType; // 'likes' or 'dislikes'
+                        const extension = ALL_EXTENSIONS_DATA.find(ext => ext.id === extensionId);
 
-                        if (extension.userActions.liked) {
-                            // If already liked, unlike it
-                            await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, false);
-                            await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, false);
-                            extension.likes--;
-                            extension.userActions.liked = false;
-                            likeStatItem.classList.remove('selected');
-                            animateStatChange(likeStatItem, '-1');
-                        } else {
-                            // If not liked, like it
-                            await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, true);
-                            await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, true);
-                            extension.likes++;
-                            extension.userActions.liked = true;
-                            likeStatItem.classList.add('selected');
-                            animateStatChange(likeStatItem, '+1');
-
-                            // If previously disliked, un-dislike it
-                            if (extension.userActions.disliked) {
-                                await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, false);
-                                await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, false);
-                                extension.dislikes--;
-                                extension.userActions.disliked = false;
-                                dislikeStatItem.classList.remove('selected');
-                                animateStatChange(dislikeStatItem, '-1');
-                            }
+                        if (!extension) {
+                            console.error('Extension data not found for stat update:', extensionId);
+                            return; // showDownloadNotificationOverlay("Extension data not found.", "error"); // Removed for mini-stats clicks
                         }
-                        likeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.likes);
-                        dislikeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.dislikes); // Update dislike count too
-                    });
 
-                    dislikeStatItem.addEventListener('click', async (e) => {
-                        e.stopPropagation(); // Prevent modal from opening
+                        let valueChange = 0;
+                        if (statType === 'likes') {
+                            const wasLiked = extension.userActions.liked;
+                            const wasDisliked = extension.userActions.disliked;
 
-                        if (extension.userActions.disliked) {
-                            // If already disliked, un-dislike it
-                            await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, false);
-                            await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, false);
-                            extension.dislikes--;
-                            extension.userActions.disliked = false;
-                            dislikeStatItem.classList.remove('selected');
-                            animateStatChange(dislikeStatItem, '-1');
-                        } else {
-                            // If not disliked, dislike it
-                            await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, true);
-                            await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, true);
-                            extension.dislikes++;
-                            extension.userActions.disliked = true;
-                            dislikeStatItem.classList.add('selected');
-                            animateStatChange(dislikeStatItem, '+1');
-
-                            // If previously liked, un-like it
-                            if (extension.userActions.liked) {
+                            if (wasLiked) {
                                 await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, false);
                                 await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, false);
                                 extension.likes--;
                                 extension.userActions.liked = false;
-                                likeStatItem.classList.remove('selected');
-                                animateStatChange(likeStatItem, '-1');
+                                valueChange = -1;
+                            } else {
+                                await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, true);
+                                await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, true);
+                                extension.likes++;
+                                extension.userActions.liked = true;
+                                valueChange = 1;
+
+                                if (wasDisliked) {
+                                    await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, false);
+                                    await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, false);
+                                    extension.dislikes--;
+                                    extension.userActions.disliked = false;
+                                }
+                            }
+                        } else if (statType === 'dislikes') {
+                            const wasLiked = extension.userActions.liked;
+                            const wasDisliked = extension.userActions.disliked;
+
+                            if (wasDisliked) {
+                                await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, false);
+                                await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, false);
+                                extension.dislikes--;
+                                extension.userActions.disliked = false;
+                                valueChange = -1;
+                            } else {
+                                await updateExtensionStatInFirebase(extensionId, 'dislikes', hashedDeviceId, true);
+                                await updateUserActionInFirebase(extensionId, 'disliked', hashedDeviceId, true);
+                                extension.dislikes++;
+                                extension.userActions.disliked = true;
+                                valueChange = 1;
+
+                                if (wasLiked) {
+                                    await updateExtensionStatInFirebase(extensionId, 'likes', hashedDeviceId, false);
+                                    await updateUserActionInFirebase(extensionId, 'liked', hashedDeviceId, false);
+                                    extension.likes--;
+                                    extension.userActions.liked = false;
+                                }
                             }
                         }
-                        dislikeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.dislikes);
-                        likeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.likes); // Update like count too
+                        
+                        // Update UI for the clicked stat item
+                        const statCountSpan = statItem.querySelector('.stat-count');
+                        statCountSpan.textContent = formatNumber(extension[statType]);
+                        if (statType === 'likes') {
+                            if (extension.userActions.liked) statItem.classList.add('selected');
+                            else statItem.classList.remove('selected');
+                            // If dislike was also updated due to a like, update its UI too
+                            const dislikeStatItem = statItem.parentNode.querySelector('.stat-item.dislike-stat');
+                            if (dislikeStatItem) {
+                                dislikeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.dislikes);
+                                if (extension.userActions.disliked) dislikeStatItem.classList.add('selected');
+                                else dislikeStatItem.classList.remove('selected');
+                            }
+                        } else if (statType === 'dislikes') {
+                            if (extension.userActions.disliked) statItem.classList.add('selected');
+                            else statItem.classList.remove('selected');
+                            // If like was also updated due to a dislike, update its UI too
+                            const likeStatItem = statItem.parentNode.querySelector('.stat-item.like-stat');
+                            if (likeStatItem) {
+                                likeStatItem.querySelector('.stat-count').textContent = formatNumber(extension.likes);
+                                if (extension.userActions.liked) likeStatItem.classList.add('selected');
+                                else likeStatItem.classList.remove('selected');
+                            }
+                        }
+                        
+                        // Animate the change
+                        if (valueChange !== 0) {
+                            animateStatChange(statItem, valueChange > 0 ? '+1' : '-1');
+                        }
                     });
+                });
 
-                    // Download stat is not directly clickable for incrementing in the grid
-                    downloadStatItem.addEventListener('click', (e) => {
+                // Attach click listener for download stat on grid item (opens modal)
+                listingsContainer.querySelectorAll('.stat-item.download-stat').forEach(statItem => {
+                    statItem.addEventListener('click', (e) => {
                         e.stopPropagation(); // Prevent modal from opening
                         // This stat item is only for display, actual download logic is in the modal.
                         // However, if they click it, still open the modal for full details.
-                        openExtensionDetailModal(extension);
+                        const extensionId = statItem.closest('.extension-item').dataset.extensionId;
+                        const extension = ALL_EXTENSIONS_DATA.find(ext => ext.id === extensionId);
+                        if (extension) {
+                            openExtensionDetailModal(extension);
+                        }
                     });
                 });
             } else {
@@ -800,3 +919,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initial load of extensions
     loadExtensions();
 });
+
+// Status Moderation:
+// 0 = None, 1 = NEW!, 2 = UPDATED!, 3 = BROKEN!, 4 = MAINTENCE!, 5 = BETA!

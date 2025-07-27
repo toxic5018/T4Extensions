@@ -2,13 +2,12 @@
     {
         "id": "1",
         "name": "Firebase Auth & DB",
-        "headerTitle": "Firebase Authentication & Database",
         "bannerImage": "assets/textures/extensions/banner/firebase_extension.png",
         "iconImage": "assets/textures/extensions/logo/firebase_extension_logo.png",
         "description": "Integrate Firebase Authentication and Realtime Database into your projects with ease.",
         "creator": "T4Studios",
         "releaseDate": "07/19/2025",
-        "version": "1.0.0",
+        "version": ["1.0.0"],
         "lastUpdated": "07/19/2025",
         "filePathToCopy": "assets/extensions/firebase_extension.js",
         "status": [0]
@@ -16,13 +15,12 @@
     {
         "id": "2",
         "name": "JSON & Array",
-        "headerTitle": "JSON And Array",
         "bannerImage": "assets/textures/extensions/banner/jsonandarray_extension.png",
         "iconImage": "assets/textures/extensions/logo/jsonandarray_extension_logo.png",
         "description": "Advanced functions for manipulating JSON objects and arrays efficiently.",
         "creator": "T4Studios",
         "releaseDate": "07/19/2025",
-        "version": "1.0.0",
+        "version": ["1.0.0"],
         "lastUpdated": "07/19/2025",
         "filePathToCopy": "assets/extensions/jsonandarray_extension.js",
         "status": [0]
@@ -30,13 +28,12 @@
     {
         "id": "3",
         "name": "TimerPlus",
-        "headerTitle": "Timer Plus",
         "bannerImage": "assets/textures/extensions/banner/timerplus_extension.png",
         "iconImage": "assets/textures/extensions/logo/timerplus_extension_logo.png",
         "description": "Enhance your project's timing capabilities with precise timer controls.",
         "creator": "T4Studios",
         "releaseDate": "07/19/2025",
-        "version": "1.0.0",
+        "version": ["1.0.0"],
         "lastUpdated": "07/19/2025",
         "filePathToCopy": "assets/extensions/timerplus_extension.js",
         "status": [0]
@@ -44,13 +41,12 @@
     {
         "id": "4",
         "name": "TemporaryVariables",
-        "headerTitle": "Temporary Variables",
         "bannerImage": "assets/textures/extensions/banner/temporaryvariables_extension.png",
         "iconImage": "assets/textures/extensions/logo/temporaryvariables_extension_logo.png",
         "description": "Create and manage temporary variables with ease.",
         "creator": "T4Studios",
         "releaseDate": "07/20/2025",
-        "version": "1.0.0",
+        "version": ["1.0.0"],
         "lastUpdated": "07/20/2025",
         "filePathToCopy": "assets/extensions/temporaryvariables_extension.js",
         "status": [0]
@@ -58,13 +54,12 @@
     {
         "id": "5",
         "name": "T4Utilities",
-        "headerTitle": "T4 Utilities",
         "bannerImage": "assets/textures/extensions/banner/t4utilities_extension.png",
         "iconImage": "assets/textures/extensions/logo/t4utilities_extension_logo.png",
         "description": "Utility based blocks: Functions, data, and more that are in T4 style.",
         "creator": "T4Studios",
         "releaseDate": "07/21/2025",
-        "version": "1.1.0",
+        "version": ["1.0.0", "1.1.0"],
         "lastUpdated": "07/23/2025",
         "filePathToCopy": "assets/extensions/t4utilities_extension.js",
         "status": [0]
@@ -72,13 +67,12 @@
     {
         "id": "6",
         "name": "UUIDGenerator",
-        "headerTitle": "UUID Generator",
         "bannerImage": "assets/textures/extensions/banner/uuidgenerator_extension.png",
         "iconImage": "assets/textures/extensions/logo/uuidgenerator_extension_logo.png",
         "description": "A fast, advanced, simple fetched UUID generator with just a click from blocks with more options.",
         "creator": "T4Studios",
         "releaseDate": "07/21/2025",
-        "version": "1.1.0",
+        "version": ["1.0.0", "1.1.0"],
         "lastUpdated": "07/23/2025",
         "filePathToCopy": "assets/extensions/uuidgenerator_extension.js",
         "status": [0]
@@ -86,13 +80,12 @@
     {
         "id": "7",
         "name": "FilesIntegration",
-        "headerTitle": "Files Integration",
         "bannerImage": "assets/textures/extensions/banner/files_extension.png",
         "iconImage": "assets/textures/extensions/logo/files_extension_logo.png",
         "description": "A simple extension to download, fetch, convert stuff in simple formats for ease.",
         "creator": "T4Studios",
         "releaseDate": "07/23/2025",
-        "version": "1.0.0",
+        "version": ["1.0.0"],
         "lastUpdated": "07/23/2025",
         "filePathToCopy": "assets/extensions/files_extension.js",
         "status": [0]
@@ -100,13 +93,12 @@
     {
         "id": "8",
         "name": "NetworkManager",
-        "headerTitle": "Network Manager",
         "bannerImage": "assets/textures/extensions/banner/networkmanager_extension.png",
         "iconImage": "assets/textures/extensions/logo/networkmanager_extension_logo.png",
         "description": "Fast and quick advanced data for fetching Network, Internet data, and many more with blocks.",
         "creator": "T4Studios",
         "releaseDate": "07/26/2025",
-        "version": "1.0.0",
+        "version": ["1.0.0"],
         "lastUpdated": "07/26/2025",
         "filePathToCopy": "assets/extensions/networkmanager_extension.js",
         "status": [1]
@@ -114,13 +106,12 @@
     {
         "id": "9",
         "name": "SensingV2",
-        "headerTitle": "Sensing V2",
         "bannerImage": "assets/textures/extensions/banner/sensingv2_extension.png",
         "iconImage": "assets/textures/extensions/logo/sensingv2_extension_logo.png",
         "description": "More ability functions with the new sensing made 2.0, more functions to take advantage of.",
         "creator": "T4Studios",
         "releaseDate": "07/26/2025",
-        "version": "1.0.0",
+        "version": ["1.0.0"],
         "lastUpdated": "07/26/2025",
         "filePathToCopy": "assets/extensions/sensingv2_extension.js",
         "status": [1]
@@ -128,13 +119,12 @@
     {
         "id": "10",
         "name": "ImageConverter",
-        "headerTitle": "Image Converter",
         "bannerImage": "assets/textures/extensions/banner/imageconverter_extension.png",
         "iconImage": "assets/textures/extensions/logo/imageconverter_extension_logo.png",
         "description": "Converts image format from one image to another format within a simple click and fetches image file type.",
         "creator": "T4Studios",
         "releaseDate": "07/26/2025",
-        "version": "1.0.0",
+        "version": ["1.0.0"],
         "lastUpdated": "07/26/2025",
         "filePathToCopy": "assets/extensions/imageconverter_extension.js",
         "status": [1]

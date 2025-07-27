@@ -15,7 +15,7 @@
     --color-neon-blue: #0ff; /* Cyan/Neon Blue */
     --color-neon-purple: #f0f; /* Magenta/Neon Purple */
     --color-gradient-neon: linear-gradient(90deg, var(--color-neon-blue) 0%, var(--color-neon-purple) 100%);
-    --color-dashed-line: #555; /* Color for the dashed separator */
+    --color-dashed-line: #555; /* Color for the separator */
 
     --color-taskbar-bg: #222;
     --color-taskbar-text: #fff;
@@ -44,7 +44,7 @@
     --color-modal-button-hover: var(--color-neon-purple); /* Hover for modal buttons */
 
     /* Status Badge Colors */
-    --color-status-new: #FFD700;    /* Yellow */
+    --color-status-new: #FFD700;     /* Yellow */
     --color-status-updated: #32CD32; /* Lime Green */
     --color-status-beta: #FFA500;   /* Orange */
     --color-status-outdated: #808080; /* Gray */
@@ -81,6 +81,18 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    /* Disable text highlight, image dragging */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+img {
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    -ms-user-drag: none;
+    user-drag: none;
 }
 
 /* Custom Scrollbar Styles for Webkit browsers (Chrome, Safari, Edge) */
@@ -191,7 +203,6 @@ body {
     max-height: 500px;
     opacity: 1;
     transition: max-height 0.5s ease-out, margin-bottom 0.5s ease-out, padding 0.5s ease-out, opacity 0.5s ease-out;
-    /* Removed border and border-image */
     border-radius: 8px;
     background-color: #2b2b40;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Simpler shadow */
@@ -398,7 +409,6 @@ body {
 
 /* Status Badge Styling (now part of left-aligned content) */
 .status-badge {
-    /* Position properties removed */
     padding: 3px 7px;
     border-radius: 5px;
     font-weight: bold;
@@ -410,8 +420,10 @@ body {
     white-space: nowrap;
     font-family: var(--font-tertiary);
     align-self: flex-start; /* Align itself to the start within its flex container */
+    opacity: 0; /* Start hidden for pop-in */
 }
 
+/* Status colors */
 .status-new {
     background-color: var(--color-status-new);
     color: #333; /* Darker text for better contrast on yellow */
@@ -438,9 +450,40 @@ body {
     background-color: var(--color-status-development); /* Orange-red */
 }
 
+/* Animation for Status Badges */
+@keyframes badge-pop-in {
+    0% {
+        transform: scale(0) rotate(-45deg);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.1) rotate(5deg); /* Bounce out slightly */
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(0deg); /* Settle in */
+        opacity: 1;
+    }
+}
+
+@keyframes badge-pulse {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.02) rotate(2deg); } /* Bounce out slightly with a little rotation */
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.status-badge.status-new,
+.status-badge.status-updated,
+.status-badge.status-beta,
+.status-badge.status-outdated,
+.status-badge.status-maintenance,
+.status-badge.status-development {
+    animation: badge-pop-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
+               badge-pulse 2s infinite ease-in-out 0.6s; /* Pulse starts after pop-in */
+}
+
 /* Styling for the stats overlay (positioned top-right) */
 .extension-stats {
-    /* Position properties removed, now aligned by parent flexbox */
     font-family: var(--font-tertiary);
     font-size: 0.85em;
     color: var(--color-text-light);
@@ -544,118 +587,6 @@ body {
     font-weight: normal;
 }
 
-
-/* Styling for extension description */
-.extension-description {
-    font-size: 0.95em;
-    color: #bbb;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding: 0 15px;
-    text-align: center;
-}
-
-/* Dashed separator line */
-.info-separator {
-    width: 80%;
-    border-bottom: 1px dashed var(--color-dashed-line);
-    margin: 15px auto;
-}
-
-/* Styling for meta info (Creator, Release Date, Version, Last Updated) */
-.meta-info-list {
-    font-size: 0.85em;
-    color: #aaa;
-    margin-bottom: 5px;
-    /* text-align: left; */ /* Removed as flex will handle positioning */
-    padding-left: 15px;
-    padding-right: 15px; /* Added right padding for consistency */
-    width: 100%;
-    display: flex; /* Make it a flex container to manage inner elements */
-    flex-direction: column; /* Stack children vertically */
-    align-items: center; /* Center content horizontally within the list */
-    gap: 10px; /* Space between the elements in the list */
-}
-
-/* Container for the Creator and Version bubbles */
-.extension-meta-bubbles {
-    display: flex;
-    justify-content: space-between; /* Pushes bubbles to left and right */
-    align-items: center;
-    width: 100%; /* Take full width of the parent (meta-info-list) */
-    padding: 0 5px; /* Small inner padding to not touch edges */
-    box-sizing: border-box; /* Include padding in width */
-    flex-wrap: wrap; /* Allow wrapping on very small screens */
-    gap: 10px; /* Gap between bubbles if they wrap */
-}
-
-/* New style for info bubbles within the meta section */
-.info-bubble {
-    padding: 8px 12px;
-    background-color: rgba(0, 0, 0, 0.5); /* Black with 0.5 opacity */
-    border: none; /* No outline/border */
-    border-radius: 5px; /* Slight rounding for cornered look */
-    box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); /* Keep subtle glow */
-    font-size: 0.9em;
-    color: var(--color-text-light);
-    white-space: nowrap; /* Prevent text wrapping */
-    flex-shrink: 0; /* Prevent shrinking too much */
-    font-family: var(--font-tertiary); /* Sen Font */
-}
-
-/* Ensure the text inside the bubbles is styled correctly */
-.info-bubble .label {
-    color: #aaa; /* Lighter color for the label */
-    margin-right: 5px; /* Space between label and value */
-}
-
-.info-bubble span {
-    font-weight: bold;
-    color: var(--color-neon-blue); /* Highlight the actual value */
-}
-
-
-.meta-info-list p {
-    margin: 0; /* Remove default paragraph margins */
-}
-
-.meta-info-list span {
-    font-weight: bold;
-    color: var(--color-text-light);
-}
-
-
-/* Footer Styling - now takes full viewport width */
-.footer {
-    background-color: var(--color-footer-bg);
-    color: var(--color-footer-text);
-    text-align: center;
-    padding: 20px 0;
-    font-size: 0.9em;
-    margin-top: auto;
-    border-top: 2px solid;
-    border-image: var(--color-gradient-neon) 1;
-    border-image-slice: 1;
-    box-shadow: var(--shadow-neon-medium);
-    width: 100%;
-    z-index: 1;
-}
-
-/* Disable text highlight, image dragging */
-body {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-img {
-    -webkit-user-drag: none;
-    -moz-user-drag: none;
-    -ms-user-drag: none;
-    user-drag: none;
-}
-
 /* Styles for the animating +1/-1 text */
 .stat-animation {
     position: absolute;
@@ -687,20 +618,103 @@ img {
     animation: stat-fade-up 0.8s forwards;
 }
 
-/* Responsive adjustments for ad-section */
-@media (max-width: 768px) {
-    .ad-section {
-        flex-direction: column;
-        text-align: center;
-    }
 
-    .ad-banner {
-        margin: 0 auto;
-    }
+/* Styling for extension description */
+.extension-description {
+    font-size: 0.95em;
+    color: #bbb;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 0 15px;
+    text-align: center;
+}
 
-    .my-website-info {
-        text-align: center;
-    }
+/* Dashed separator line (now solid) */
+.info-separator {
+    width: 80%;
+    border-bottom: 1px solid var(--color-dashed-line); /* Changed from dashed to solid */
+    margin: 15px auto;
+}
+
+/* Styling for meta info (Creator, Release Date, Version, Last Updated) */
+.meta-info-list {
+    font-size: 0.85em;
+    color: #aaa;
+    margin-bottom: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Changed from center to flex-start */
+    gap: 10px;
+    font-family: var(--font-tertiary); /* Added to apply Sen font */
+}
+
+/* Container for the Creator and Version bubbles */
+.extension-meta-bubbles {
+    display: flex;
+    justify-content: flex-start; /* Changed from space-between to flex-start */
+    align-items: center;
+    width: 100%;
+    padding: 0 5px;
+    box-sizing: border-box;
+    flex-wrap: wrap; /* Allow wrapping on very small screens */
+    gap: 10px; /* Gap between bubbles if they wrap */
+}
+
+/* New style for info bubbles within the meta section */
+.info-bubble {
+    padding: 8px 12px;
+    background-color: rgba(0, 0, 0, 0.5); /* Black with 0.5 opacity */
+    border: none; /* No outline/border */
+    border-radius: 5px; /* Slight rounding for cornered look */
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); /* Keep subtle glow */
+    font-size: 0.9em;
+    color: var(--color-text-light);
+    white-space: nowrap; /* Prevent text wrapping */
+    flex-shrink: 0; /* Prevent shrinking too much */
+    font-family: var(--font-tertiary); /* Sen Font */
+}
+
+/* Ensure the text inside the bubbles is styled correctly */
+.info-bubble .label {
+    color: #aaa; /* Lighter color for the label */
+    margin-right: 5px; /* Space between label and value */
+}
+
+.info-bubble span {
+    font-weight: bold;
+    color: var(--color-neon-blue); /* Highlight the actual value */
+}
+
+/* NEW: Style for the "time ago" text */
+.time-ago {
+    font-family: var(--font-tertiary); /* Sen Font */
+    color: #888; /* Slightly dimmer than main text */
+    font-size: 0.8em; /* Smaller than the main date/version text */
+    margin-left: 5px; /* Space from the actual date/version */
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+.meta-info-list p {
+    margin: 0; /* Remove default paragraph margins */
+}
+
+/* Footer Styling - now takes full viewport width */
+.footer {
+    background-color: var(--color-footer-bg);
+    color: var(--color-footer-text);
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.9em;
+    margin-top: auto;
+    border-top: 2px solid;
+    border-image: var(--color-gradient-neon) 1;
+    border-image-slice: 1;
+    box-shadow: var(--shadow-neon-medium);
+    width: 100%;
+    z-index: 1;
 }
 
 /* Website Banner Section */
@@ -743,58 +757,6 @@ img {
     font-size: 1.1em;
 }
 
-/* Responsive adjustments for website banner */
-@media (max-width: 768px) {
-    .website-banner-section {
-        flex-direction: column;
-        text-align: center;
-        padding: 20px;
-    }
-    .website-banner-image {
-        max-width: 100%;
-    }
-    .website-banner-section .my-website-info {
-        text-align: center;
-        width: 100%;
-    }
-}
-
-/* Animation for Status Badges */
-@keyframes badge-pop-in {
-    0% {
-        transform: scale(0) rotate(-45deg);
-        opacity: 0;
-    }
-    70% {
-        transform: scale(1.1) rotate(5deg); /* Bounce out slightly */
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1) rotate(0deg); /* Settle in */
-        opacity: 1;
-    }
-}
-
-@keyframes badge-pulse {
-    0% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.02) rotate(2deg); } /* Bounce out slightly with a little rotation */
-    100% { transform: scale(1) rotate(0deg); }
-}
-
-.status-badge.status-new,
-.status-badge.status-updated,
-.status-badge.status-beta,
-.status-badge.status-outdated,
-.status-badge.status-maintenance,
-.status-badge.status-development {
-    animation: badge-pop-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
-               badge-pulse 2s infinite ease-in-out 0.6s; /* Pulse starts after pop-in */
-}
-
-/* Ensure the position is relative on the parent for absolute positioning of the badge */
-.extension-item {
-    position: relative;
-}
 
 /* --- Main Modal Styles --- */
 .modal-overlay {
@@ -849,7 +811,7 @@ img {
     align-items: flex-start;
     margin-bottom: 20px;
     padding-bottom: 10px;
-    border-bottom: 1px dashed var(--color-dashed-line);
+    border-bottom: 1px solid var(--color-dashed-line); /* Changed from dashed to solid */
 }
 
 .modal-title {
@@ -905,7 +867,7 @@ img {
     flex-direction: column; /* Stack elements vertically */
     gap: 15px; /* Space between elements */
     padding-top: 20px;
-    border-top: 1px dashed var(--color-dashed-line);
+    border-top: 1px solid var(--color-dashed-line); /* Changed from dashed to solid */
     margin-top: auto; /* Pushes footer to bottom if content is short */
     align-items: center; /* Center items horizontally */
 }
@@ -936,9 +898,13 @@ img {
 }
 
 /* Specific colors for modal icons when selected */
-.modal-stats .stat-item.like-stat.selected .material-icons.like-icon,
+.modal-stats .stat-item.like-stat.selected .material-icons.like-icon {
+    color: var(--color-shine-green); /* Green when selected */
+    text-shadow: 0 0 5px var(--color-shine-green);
+}
 .modal-stats .stat-item.dislike-stat.selected .material-icons.dislike-icon {
-    color: var(--color-icon-like); /* Light blue when selected */
+    color: var(--color-shine-red); /* Red when selected */
+    text-shadow: 0 0 5px var(--color-shine-red);
 }
 
 .modal-stats .stat-item.download-stat .material-icons.download-icon {
@@ -1020,43 +986,6 @@ img {
     box-shadow: 0 0 10px var(--color-shine-red);
 }
 
-/* Responsive adjustments for modal */
-@media (max-width: 600px) {
-    .modal-content {
-        padding: 20px;
-        width: 95%;
-    }
-    .modal-title {
-        font-size: 1.5em;
-    }
-    .modal-close {
-        font-size: 2em;
-    }
-    .modal-footer {
-        flex-direction: column;
-        align-items: flex-start; /* Align text to left */
-        gap: 15px;
-    }
-    .modal-download-button {
-        width: 100%; /* Full width button */
-        text-align: center;
-    }
-    .modal-stats {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    }
-    .modal-stats .stat-item {
-        width: 100%;
-        justify-content: center;
-    }
-    .modal-action-buttons {
-        flex-direction: row; /* Keep as row if possible, stack if truly too narrow */
-        justify-content: center;
-        width: 100%;
-    }
-}
-
 /* --- Download Notification Overlay Styles --- */
 .notification-overlay {
     position: fixed;
@@ -1068,7 +997,7 @@ img {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1001; /* Higher than main modal */
+    z-index: 2001; /* Higher than main modal */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -1081,19 +1010,18 @@ img {
 
 .notification-content {
     background-color: var(--color-notification-overlay-bg);
-    /* Removed border and border-image */
     border-radius: 10px;
     padding: 30px;
     max-width: 450px; /* Smaller than main modal */
     width: 90%;
     text-align: center;
-    /* Removed default box-shadow for type-specific shadows */
     transform: translateY(20px);
     opacity: 0;
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    /* Removed border and box-shadow from here to apply dynamically via success/error classes */
 }
 
 .notification-overlay.show .notification-content {
@@ -1139,23 +1067,90 @@ img {
 
 /* Specific styles for success/error notifications */
 .notification-content.success {
-    /* Removed border-image, now just a background with a strong shadow */
-    background-color: var(--color-notification-overlay-bg); /* Keep consistency with other backgrounds */
     box-shadow: var(--shadow-notification-success);
+    border: 2px solid var(--color-notification-success-bg); /* Use new background color for border */
 }
 
 .notification-content.success .notification-title {
-    color: var(--color-notification-success-border);
-    text-shadow: 0 0 8px var(--color-notification-success-border), 0 0 15px rgba(40, 167, 69, 0.5);
+    color: var(--color-notification-success-bg); /* Use new background color for title */
+    text-shadow: 0 0 8px var(--color-notification-success-bg), 0 0 15px rgba(40, 167, 69, 0.5);
 }
 
 .notification-content.error {
-    /* Removed border-image, now just a background with a strong shadow */
-    background-color: var(--color-notification-overlay-bg); /* Keep consistency with other backgrounds */
     box-shadow: var(--shadow-notification-error);
+    border: 2px solid var(--color-notification-error-bg); /* Use new background color for border */
 }
 
 .notification-content.error .notification-title {
-    color: var(--color-notification-error-border);
-    text-shadow: 0 0 8px var(--color-notification-error-border), 0 0 15px rgba(220, 53, 69, 0.5);
+    color: var(--color-notification-error-bg); /* Use new background color for title */
+    text-shadow: 0 0 8px var(--color-notification-error-bg), 0 0 15px rgba(220, 53, 69, 0.5);
+}
+
+/* Responsive adjustments for ad-section */
+@media (max-width: 768px) {
+    .ad-section {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .ad-banner {
+        margin: 0 auto;
+    }
+
+    .my-website-info {
+        text-align: center;
+    }
+}
+
+/* Responsive adjustments for website banner */
+@media (max-width: 768px) {
+    .website-banner-section {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+    .website-banner-image {
+        max-width: 100%;
+    }
+    .website-banner-section .my-website-info {
+        text-align: center;
+        width: 100%;
+    }
+}
+
+/* Responsive adjustments for modal */
+@media (max-width: 600px) {
+    .modal-content {
+        padding: 20px;
+        width: 95%;
+    }
+    .modal-title {
+        font-size: 1.5em;
+    }
+    .modal-close {
+        font-size: 2em;
+    }
+    .modal-footer {
+        flex-direction: column;
+        align-items: flex-start; /* Align text to left */
+        gap: 15px;
+    }
+    .modal-download-button {
+        width: 100%; /* Full width button */
+        text-align: center;
+    }
+    .modal-stats {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    .modal-stats .stat-item {
+        width: 100%;
+        justify-content: center;
+    }
+    .modal-action-buttons {
+        flex-direction: row; /* Keep as row if possible, stack if truly too narrow */
+        justify-content: center;
+        width: 100%;
+    }
 }
