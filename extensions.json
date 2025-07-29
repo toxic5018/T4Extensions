@@ -101,7 +101,7 @@
         "version": ["1.0.0"],
         "lastUpdated": "07/26/2025",
         "filePathToCopy": "assets/extensions/networkmanager_extension.js",
-        "status": [1]
+        "status": [0]
     },
     {
         "id": "9",
@@ -114,7 +114,7 @@
         "version": ["1.0.0"],
         "lastUpdated": "07/26/2025",
         "filePathToCopy": "assets/extensions/sensingv2_extension.js",
-        "status": [1]
+        "status": [0]
     },
     {
         "id": "10",
@@ -127,6 +127,19 @@
         "version": ["1.0.0"],
         "lastUpdated": "07/26/2025",
         "filePathToCopy": "assets/extensions/imageconverter_extension.js",
+        "status": [0]
+    },
+    {
+        "id": "11",
+        "name": "Currency Conversion",
+        "bannerImage": "assets/textures/extensions/banner/currencyconversion_extension.png",
+        "iconImage": "assets/textures/extensions/logo/currencyconversion_extension_logo.png",
+        "description": "Fast and well-powered data fetch system, includes string to globally convert currency value to a different currency system.",
+        "creator": "T4Studios",
+        "releaseDate": "07/28/2025",
+        "version": ["1.0.0"],
+        "lastUpdated": "07/28/2025",
+        "filePathToCopy": "assets/extensions/currencyconversion_extension.js",
         "status": [1]
     }
 ]
